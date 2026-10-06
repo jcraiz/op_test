@@ -1,0 +1,140 @@
+!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Adaptive Oral Placement Test</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1c1c1a;--mut:#6b6a64;--line:#dedbd2;--acc:#1f5eff;--accink:#fff;--ok:#1a7f4b;--bad:#b3341f;--soft:#eef2ff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15161a;--card:#1e2026;--ink:#ecebe6;--mut:#a09f98;--line:#33353d;--acc:#6f95ff;--accink:#0b1020;--ok:#4cc789;--bad:#ff8a73;--soft:#232a45}}
+:root[data-theme="dark"]{--bg:#15161a;--card:#1e2026;--ink:#ecebe6;--mut:#a09f98;--line:#33353d;--acc:#6f95ff;--accink:#0b1020;--ok:#4cc789;--bad:#ff8a73;--soft:#232a45}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:1.5rem;margin:0 0 4px}h2{font-size:1.1rem;margin:0 0 8px}
+.sub{color:var(--mut);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.steps{display:flex;gap:6px;margin-bottom:16px}
+.step{flex:1;text-align:center;font-size:.78rem;padding:6px 2px;border-radius:8px;border:1px solid var(--line);color:var(--mut);background:var(--card)}
+.step.on{background:var(--acc);color:var(--accink);border-color:var(--acc);font-weight:600}
+.step.done{color:var(--ok);border-color:var(--ok)}
+.q{font-size:1.1rem;font-weight:600;margin:0 0 4px}
+.cd{font-size:.85rem;color:var(--mut);margin:0 0 10px}
+.scores{display:grid;grid-template-columns:repeat(11,1fr);gap:4px}
+.scores button{padding:9px 0;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;cursor:pointer;font:inherit;font-size:.9rem}
+.scores button.sel{background:var(--acc);color:var(--accink);border-color:var(--acc);font-weight:700}
+textarea,input[type=text]{width:100%;margin-top:10px;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:.9rem}
+textarea{resize:vertical;min-height:44px}
+.btn{background:var(--acc);color:var(--accink);border:0;border-radius:10px;padding:11px 20px;font:inherit;font-weight:600;cursor:pointer}
+.btn.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tag{display:inline-block;font-size:.75rem;padding:2px 8px;border-radius:99px;background:var(--soft);color:var(--acc);font-weight:600}
+.note{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:.9rem;margin-bottom:14px}
+.level{font-size:3rem;font-weight:800;color:var(--acc);line-height:1}
+.wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}
+ul.fb{margin:6px 0 0;padding-left:18px}
+@media print{.noprint{display:none!important}body{background:#fff;color:#000}.card{border-color:#999}}
+@media (max-width:480px){.scores{grid-template-columns:repeat(6,1fr)}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+const B=[
+[["What's your name? How do you spell your surname?","I can spell my name."],["Where are you from?","I can say countries and nationalities."],["Did you learn English at school? For how many years?","I can talk about things that happened in my life."],["What do you do now? Do you work or are you a student?","I can talk about jobs."],["What do you do in your free time?","I can talk about my free-time activities and say when I do them."],["Do you like football? What sports do you like?","I can say what I like and don't like."],["What do you do every day? What time do you get up/start work?","I can describe my daily routine."],["What subjects did you study at school? What exams did you take?","I can talk about exams and studying."],["Tell me something you could do well at school. And something you can do well now.","I can talk about things I can do in the present and could do in the past."],["Tell me about the weather in your country.","I can talk about the weather."],["What are you going to do at the weekend?","I can talk about future plans."],["Have you been to an English-speaking country (before)?","I can talk about my experiences."]],
+[["Let's talk about your friends. How often do you normally see them?","I can talk about how often I do things."],["Tell me about something you did with your friends recently.","I can describe past events and say when they happened."],["What do you think your friends are doing now?","I can say what people are doing now and what they usually do."],["Tell me about your best friend. What is he or she like?","I can describe people's character."],["Let's talk about your house or home. How would you describe it?","I can describe my home and where I live."],["How about your country/town. How is it different now from 20 years ago?","I can talk about how things are different now compared to the past."]],
+[["What kinds of things do people in your country/town do in their free time?","I can talk about free time activities."],["How do you think your country/town will change in the next 20 years?","I can make predictions about the future."],["What advice would you give to someone visiting your country/town?","I can give, ask for and respond to advice."],["Tell me about the main news stories in your country at the moment.","I can talk about things that have happened in the news."],["What do you think the main news stories are in the UK or America at the moment?","I can make deductions about the present."],["If you had been born in the UK or America, how would your life up to now have been different?","I can talk about imaginary situations in the past."]],
+[["Tell me about any other languages you speak, apart from English.","I can talk about my language ability."],["Tell me about a book you've read recently, either in English or in your own language.","I can talk about books I've read."],["Some people think everyone in the world will speak English within 50 years. What do you think?","I can express how certain I am about future events."],["How do you think the Internet has changed the way people learn English?","I can express in detail how things in the past connect to the present."],["Would you say you are a practical person? What jobs can you do about the house?","I can talk about household jobs."],["Tell me how you imagine your life this time next year.","I can talk about things I have done and will have done in the future."]],
+[["What, in your opinion, are the characteristics of a good friend?","I can describe people's characters, using a range of adjectives."],["Do you think life for young people today is easier or harder than it was for their parents and grandparents?","I can talk about the present and the past."],["How would you improve the education system in your country?","I can take part in a discussion on education and express my ideas clearly."],["We hear a lot about globalisation nowadays. What are your views on globalisation?","I can give my views and respond to opinions."],["What famous person, either present or past, would you like to meet and why?","I can understand and use a range of complex conditional forms."],["What are the problems associated with learning a language at an advanced level? How can you continue to make progress?","I can talk about my action plan for the future."]]];
+const FAIL=["A1","A2","B1","B2"]; // level if student fails to progress from bank 1..4
+const D={
+C1:["give clear, detailed descriptions and presentations on complex subjects, integrating sub-themes, developing particular points and rounding off with an appropriate conclusion."],
+B2:["give clear, systematically developed descriptions and presentations, with appropriate highlighting of significant points, and relevant supporting detail.","give clear, detailed descriptions and presentations on a wide range of subjects related to their field of interest, expanding and supporting ideas with subsidiary points and relevant examples."],
+B1:["reasonably fluently sustain a straightforward description of one of a variety of subjects within their field of interest, presenting it as a linear sequence of points."],
+A2:["give a simple description or presentation of people, living or working conditions, daily routines, likes/dislikes, etc. as a short series of simple phrases and sentences linked into a list."],
+A1:["produce simple, mainly isolated phrases about people and places."],
+A0:["produce short phrases about themselves, giving basic personal information (e.g. name, address, family, nationality)."]};
+const FB={C1:"Focus feedback on structure: integrating sub-themes, developing points, and closing with a conclusion.",B2:"Look for systematic development, highlighted key points and relevant examples; push for more nuance and abstract topics.",B1:"Look for fluent linear sequencing; encourage expanding ideas with examples, reasons and connecting devices.",A2:"Encourage linking simple sentences with connectors (and, but, because) and extending beyond lists.",A1:"Encourage full simple sentences about people, places and routines; build core vocabulary.",A0:"Focus on basic personal information (name, address, family, nationality) in short phrases."};
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const avg=a=>a.reduce((x,y)=>x+y,0)/a.length;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let S;
+function init(){S={name:"",started:false,bank:0,phase:"main",pool:[],log:[],cur:[],level:null}}
+function qNum(b,i){return b===0?i+1:12+(b-1)*6+i+1}
+function deal(){ // draw questions for the current step
+  const used=S.log.filter(l=>l.bank===S.bank).map(l=>l.i);
+  if(!S.pool[S.bank])S.pool[S.bank]=shuffle(B[S.bank].map((_,i)=>i));
+  const n=(S.bank===0&&S.phase==="main")?3:2;
+  const take=S.pool[S.bank].filter(i=>!used.includes(i)).slice(0,n);
+  S.cur=take.map(i=>({bank:S.bank,i,phase:S.phase,score:null,notes:""}));
+}
+function render(){
+  const a=document.getElementById("app");
+  let h=`<h1>Adaptive Oral Placement Test</h1><p class="sub">Examiner tool · based on the face2face Oral Placement Test Question Banks</p>`;
+  if(!S.started){
+    h+=`<div class="card"><h2>Start a new assessment</h2>
+    <p>Score each answer from <b>0</b> (no response) to <b>10</b> (excellent). The tool adapts automatically:</p>
+    <ul><li>Bank 1: 3 questions. Average of <b>7–10</b> moves the student to Bank 2.</li>
+    <li>Banks 2–4: 2 questions each. Average of <b>8–10</b> moves the student up.</li>
+    <li>If the average is below the threshold, 2 more questions from the same bank are asked and the level is confirmed.</li>
+    <li>Reaching Bank 5 gives <b>C1</b>.</li></ul>
+    <input type="text" id="nm" placeholder="Student name (optional)" value="${esc(S.name)}">
+    <p><button class="btn" onclick="start()">Begin assessment</button></p></div>`;
+    a.innerHTML=h;return;
+  }
+  h+=`<div class="steps noprint">`+[1,2,3,4,5].map(n=>`<div class="step ${S.level?(n<=S.bank+1?"done":""):(n-1===S.bank?"on":(n-1<S.bank?"done":""))}">Bank ${n}</div>`).join("")+`</div>`;
+  if(S.level){h+=result();a.innerHTML=h;return}
+  const extra=S.phase==="extra";
+  h+=`<div class="note">Student: <b>${esc(S.name||"—")}</b> · Bank ${S.bank+1} · ${extra?"Confirmation questions (average below threshold)":"Main questions"}. Score each answer 0–10.</div>`;
+  S.cur.forEach((c,k)=>{const q=B[c.bank][c.i];
+    h+=`<div class="card"><span class="tag">Question ${qNum(c.bank,c.i)}</span>
+    <p class="q">${esc(q[0])}</p><p class="cd">Can do: ${esc(q[1])}</p>
+    <div class="scores">`+Array.from({length:11},(_,s)=>`<button class="${c.score===s?"sel":""}" onclick="setS(${k},${s})">${s}</button>`).join("")+`</div>
+    <textarea placeholder="Notes (optional)" oninput="S.cur[${k}].notes=this.value">${esc(c.notes)}</textarea></div>`});
+  const ok=S.cur.every(c=>c.score!==null);
+  h+=`<div class="row"><button class="btn" ${ok?"":"disabled"} onclick="submit()">${ok?"Submit scores":"Score all questions to continue"}</button><button class="btn sec" onclick="if(confirm('Discard this assessment?')){init();render()}">Cancel</button></div>`;
+  a.innerHTML=h;
+}
+function start(){S.name=document.getElementById("nm").value.trim();S.started=true;deal();render()}
+function setS(k,s){S.cur[k].score=s;const n=S.cur.map(c=>c.notes);render();}
+function submit(){
+  S.log.push(...S.cur);const b=S.bank;
+  if(S.phase==="extra"){finish(b);return}
+  const th=b===0?7:8,m=avg(S.cur.map(c=>c.score));
+  if(b===4){S.level="C1";render();return}
+  if(m>=th){S.bank++;S.phase="main";deal();}
+  else{S.phase="extra";deal();}
+  window.scrollTo(0,0);render();
+}
+function finish(b){
+  let lv=FAIL[b];
+  if(b===0){const all=S.log.filter(l=>l.bank===0).map(l=>l.score);if(avg(all)<3)lv="A0"}
+  S.level=lv;window.scrollTo(0,0);render();
+}
+function result(){
+  const lv=S.level;
+  let h=`<div class="card"><p class="cd" style="margin:0">Estimated level${S.name?" for "+esc(S.name):""}</p><div class="level">${lv}</div>
+  <p style="margin-top:14px"><b>At this level, a person can...</b></p><ul>${D[lv].map(d=>`<li>${esc(d)}</li>`).join("")}</ul>
+  <div class="note"><b>Feedback focus:</b> ${esc(FB[lv])}</div></div>`;
+  h+=`<div class="card"><h2>Score summary</h2><div class="wrap"><table><tr><th>Bank</th><th>Q</th><th>Score</th><th>Notes</th></tr>`;
+  S.log.forEach(l=>{h+=`<tr><td>${l.bank+1}${l.phase==="extra"?" (extra)":""}</td><td>${qNum(l.bank,l.i)}</td><td>${l.score}/10</td><td>${esc(l.notes)}</td></tr>`});
+  h+=`</table></div><p class="cd" style="margin-top:10px">`;
+  [...new Set(S.log.map(l=>l.bank))].forEach(b=>{const m=avg(S.log.filter(l=>l.bank===b&&l.phase==="main").map(l=>l.score));const th=b===0?7:8;
+    h+=`Bank ${b+1} main average: <b>${m.toFixed(1)}</b> ${b===4?"":(m>=th?`<span class="ok">(met ≥${th})</span>`:`<span class="bad">(below ${th})</span>`)} · `});
+  h+=`</p></div><div class="row noprint"><button class="btn" onclick="window.print()">Print / save PDF</button><button class="btn sec" onclick="copySum()">Copy summary</button><button class="btn sec" onclick="init();render()">New assessment</button></div>`;
+  return h;
+}
+function copySum(){
+  let t=`Oral Placement Test – ${S.name||"Student"}\nLevel: ${S.level}\n\n`+S.log.map(l=>`Q${qNum(l.bank,l.i)} (Bank ${l.bank+1}${l.phase==="extra"?", extra":""}): ${l.score}/10${l.notes?" – "+l.notes:""}`).join("\n")+`\n\nAt this level, a person can...\n`+D[S.level].join("\n");
+  navigator.clipboard&&navigator.clipboard.writeText(t).then(()=>alert("Summary copied"),()=>alert("Copy not available"));
+}
+init();render();
+</script>
+</body>
+</html>
