@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -39,6 +39,7 @@ table{width:100%;border-collapse:collapse;font-size:.9rem}
 th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
 .ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}
 ul.fb{margin:6px 0 0;padding-left:18px}
+details summary{cursor:pointer;font-size:1.05rem}details p{margin:12px 0 4px}details li{margin-bottom:4px}
 @media print{.noprint{display:none!important}body{background:#fff;color:#000}.card{border-color:#999}}
 @media (max-width:480px){.scores{grid-template-columns:repeat(6,1fr)}}
 </style>
@@ -79,13 +80,31 @@ function render(){
   let h=`<h1>Adaptive Oral Placement Test</h1><p class="sub">Examiner tool · based on the face2face Oral Placement Test Question Banks</p>`;
   if(!S.started){
     h+=`<div class="card"><h2>Start a new assessment</h2>
-    <p>Score each answer from <b>0</b> (no response) to <b>10</b> (excellent). The tool adapts automatically:</p>
-    <ul><li>Bank 1: 3 questions. Average of <b>7–10</b> moves the student to Bank 2.</li>
-    <li>Banks 2–4: 2 questions each. Average of <b>8–10</b> moves the student up.</li>
-    <li>If the average is below the threshold, 2 more questions from the same bank are asked and the level is confirmed.</li>
-    <li>Reaching Bank 5 gives <b>C1</b>.</li></ul>
     <input type="text" id="nm" placeholder="Student name (optional)" value="${esc(S.name)}">
-    <p><button class="btn" onclick="start()">Begin assessment</button></p></div>`;
+    <p><button class="btn" onclick="start()">Begin assessment</button></p></div>
+    <details class="card" open><summary><b>How this tool works (examiner guide)</b></summary>
+    <p><b>What it does:</b> it finds a student's speaking level, from A0 to C1, by moving to harder questions only when the student shows they can handle them. You read each question aloud, listen, and score the answer from <b>0</b> (no response) to <b>10</b> (excellent). The tool chooses the next questions and gives the level at the end.</p>
+    <p><b>Step by step</b></p>
+    <ol>
+    <li><b>Start.</b> Enter the student's name (optional) and press <i>Begin</i>. You get 3 simple questions from Bank 1.</li>
+    <li><b>Score and submit.</b> Score each answer and add notes. They help when you give feedback.</li>
+    <li><b>The tool decides.</b> If the average reaches the threshold (7+ in Bank 1, 8+ in Banks 2–4), the student moves up to the next bank for 2 harder questions. If not, the tool gives 2 more questions from the same bank to confirm, and the level is set.</li>
+    <li><b>Bank 5.</b> A student who reaches Bank 5 and answers its 2 questions is placed at C1.</li></ol>
+    <div class="wrap"><table><tr><th>Where the student stops moving up</th><th>Level</th></tr>
+    <tr><td>Below threshold in Bank 1</td><td>A1 (A0 if the Bank 1 average is very low)</td></tr>
+    <tr><td>Below threshold in Bank 2</td><td>A2</td></tr>
+    <tr><td>Below threshold in Bank 3</td><td>B1</td></tr>
+    <tr><td>Below threshold in Bank 4</td><td>B2</td></tr>
+    <tr><td>Completes Bank 5</td><td>C1</td></tr></table></div>
+    <p><b>How it helps you assess speaking</b></p>
+    <ul><li><b>Quick:</b> students skip questions that are far too easy or hard, so you usually ask about 8–12 questions.</li>
+    <li><b>Consistent:</b> every examiner follows the same rules.</li>
+    <li><b>Focused:</b> each question shows a "can do" statement, so you know which skill to listen for.</li>
+    <li><b>Feedback-ready:</b> the results show the level, what a speaker at that level can do, a suggested feedback focus, and your scores and notes, which you can print or copy.</li></ul>
+    <p><b>Tips</b></p>
+    <ul><li>Score what the student says and how well they say it (fluency, range of language, development of ideas), not whether you agree with their opinion.</li>
+    <li>Let the student speak as long as they can before you score.</li>
+    <li>Use the notes box for examples of good language or mistakes to mention in feedback.</li></ul></details>`;
     a.innerHTML=h;return;
   }
   h+=`<div class="steps noprint">`+[1,2,3,4,5].map(n=>`<div class="step ${S.level?(n<=S.bank+1?"done":""):(n-1===S.bank?"on":(n-1<S.bank?"done":""))}">Bank ${n}</div>`).join("")+`</div>`;
